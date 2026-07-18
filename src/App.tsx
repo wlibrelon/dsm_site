@@ -5,6 +5,9 @@ import { TooltipProvider } from '@/components/ui/tooltip'
 import Index from './pages/Index'
 import NotFound from './pages/NotFound'
 import { Layout } from './components/Layout'
+import AdminLogin from './pages/admin/AdminLogin'
+import AdminDashboard from './pages/admin/AdminDashboard'
+import AdminGate from './components/admin/AdminGate'
 
 const App = () => (
   <BrowserRouter>
@@ -15,6 +18,15 @@ const App = () => (
         <Route element={<Layout />}>
           <Route path="/" element={<Index />} />
         </Route>
+        <Route path="/admin/login" element={<AdminLogin />} />
+        <Route
+          path="/admin"
+          element={
+            <AdminGate>
+              <AdminDashboard />
+            </AdminGate>
+          }
+        />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </TooltipProvider>
