@@ -36,15 +36,16 @@ export function Hero() {
           <div className="animate-fade-in-up">
             <div className="inline-flex items-center rounded-full border border-primary/20 bg-primary/5 px-3 py-1 text-sm font-medium text-primary mb-6">
               <Activity className="mr-2 h-4 w-4" />
-              Ensino Dinâmico em Todos os Níveis
+              Uma categoria nova de aula, não mais um app de slides
             </div>
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-foreground mb-6 leading-tight">
               Slides que respondem em <span className="text-primary">tempo real</span> ao que você
               digita.
             </h1>
             <p className="text-lg md:text-xl text-muted-foreground mb-8 max-w-lg">
-              Transforme suas aulas com simulações matemáticas ao vivo em Python, integradas
-              diretamente na sua apresentação.
+              Por fora, uma apresentação normal. Por dentro, um cálculo de verdade rodando em cada
+              slide — sem você precisar programar. Mude um número na hora da aula e o gráfico
+              muda com ele, para a turma toda ver.
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
               <Button size="lg" asChild className="h-12 px-8 text-base shadow-lg">

@@ -12,14 +12,14 @@ import {
 export function Features() {
   const features = [
     {
-      icon: Code2,
-      title: 'Simulação Python ao Vivo',
-      desc: 'Motor interno com suporte nativo a NumPy, SciPy e Pandas para cálculos complexos.',
-    },
-    {
       icon: PenTool,
       title: 'Sem Barreira de Código',
-      desc: 'Configure entradas e saídas visualmente, ou use o assistente IA para escrever scripts.',
+      desc: 'Configure entradas e saídas visualmente, ou descreva o cálculo em português para a IA escrever o script. Você não precisa programar.',
+    },
+    {
+      icon: Code2,
+      title: 'Motor de Cálculo Real',
+      desc: 'Por trás de cada slide roda Python de verdade — do mais simples ao mais avançado (com NumPy, SciPy e Pandas, para quem já conhece essas bibliotecas).',
     },
     {
       icon: BarChart3,

@@ -140,7 +140,10 @@ export function Layout() {
                   </a>
                 </li>
                 <li>
-                  <a href="#" className="hover:text-white transition-colors">
+                  <a
+                    href="mailto:contato@dynamicslidemaker.com.br"
+                    className="hover:text-white transition-colors"
+                  >
                     Suporte Institucional
                   </a>
                 </li>

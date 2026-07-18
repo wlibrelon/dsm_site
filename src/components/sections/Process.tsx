@@ -6,22 +6,22 @@ export function Process() {
     {
       icon: LayoutIcon,
       title: '1. Montagem Visual',
-      description: 'Crie slides usando um editor familiar com textos, imagens e formas.',
+      description: 'Crie o slide num editor de arrastar e soltar, com textos, imagens e formas — igual a qualquer editor de apresentação.',
     },
     {
       icon: Settings,
       title: '2. Configuração',
-      description: 'Defina quais campos numéricos serão interativos (inputs) no slide.',
+      description: 'Escolha quais números da fórmula a turma vai poder alterar durante a aula.',
     },
     {
       icon: Bot,
       title: '3. Assistente de IA',
-      description: 'Descreva a lógica em português e a IA gera o código Python por trás.',
+      description: 'Não sabe programar? Descreva o cálculo em português e a IA escreve o código Python por trás — você não vê uma linha de código se não quiser.',
     },
     {
       icon: Play,
       title: '4. Execução ao Vivo',
-      description: 'Apresente, digite novos dados e veja os resultados atualizarem na hora.',
+      description: 'Apresente normalmente. Ao digitar um novo valor, o gráfico e o resultado mudam na hora, para todo mundo ver.',
     },
   ]
 
@@ -33,8 +33,8 @@ export function Process() {
             Simples para quem cria, poderoso para quem assiste
           </h2>
           <p className="text-lg text-muted-foreground">
-            O fluxo de trabalho do DSM foi desenhado para não exigir conhecimentos avançados de
-            programação.
+            Você não precisa saber programar. O DSM foi desenhado para professores — não para
+            desenvolvedores.
           </p>
         </div>
 

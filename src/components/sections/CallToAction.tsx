@@ -53,7 +53,8 @@ export function CallToAction() {
       id="solicitar-acesso"
       className="py-24 bg-primary text-primary-foreground relative overflow-hidden"
     >
-      <div className="absolute inset-0 bg-[url('https://img.usecurling.com/p/800/400?q=abstract%20math&color=blue')] opacity-10 bg-cover bg-center" />
+      <div className="absolute -top-24 -right-24 w-96 h-96 bg-white/10 rounded-full blur-3xl" />
+      <div className="absolute -bottom-24 -left-24 w-96 h-96 bg-accent/20 rounded-full blur-3xl" />
       <div className="container mx-auto px-4 md:px-6 relative z-10">
         <div className="max-w-4xl mx-auto bg-white text-slate-900 rounded-2xl shadow-2xl p-8 md:p-12 lg:p-16 flex flex-col md:flex-row gap-12 items-center">
           <div className="flex-1">
