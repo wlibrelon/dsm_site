@@ -6,6 +6,9 @@
   "type": "module",
   "scripts": {
     "start": "node server.js",
+    "migrate": "node api/migrate.js",
+    "gerar-chaves": "node api/gerarChaves.js",
+    "emitir-licenca": "node api/emitirLicenca.js",
     "dev": "vite",
     "build": "vite build",
     "serve": "node server.js",
@@ -19,6 +22,9 @@
     "test:watch": "echo \"there are no tests for this project\" && exit 0"
   },
   "dependencies": {
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "mysql2": "^3.11.0",
     "@hookform/resolvers": "^5.4.0",
     "@radix-ui/react-accordion": "^1.2.14",
     "@radix-ui/react-alert-dialog": "^1.1.17",

@@ -1,52 +1,30 @@
-// Servidor estático simples para o plano Node.js/VPS da Hostinger.
-// Não é necessário se o site for hospedado como "Website" estático (Apache) —
-// nesse caso o .htaccess em public/.htaccess já resolve o roteamento.
-// Uso: 1) npm run build   2) node server.js
+// Servidor do site institucional + API do servidor de licenças, pro plano
+// Node.js/VPS da Hostinger. Serve o build estático (dist/) igual antes, e
+// agora também monta /api/licencas/* (Express) pro DSM consultar.
+// Uso: 1) npm run build   2) npm run migrate   3) node server.js
 // A Hostinger injeta a porta em process.env.PORT.
-
-import http from 'node:http'
-import { readFile, stat } from 'node:fs/promises'
-import { extname, join } from 'node:path'
+import 'dotenv/config'
+import express from 'express'
+import path from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { rotasLicenca } from './api/rotas.js'
 
 const __dirname = fileURLToPath(new URL('.', import.meta.url))
-const DIST_DIR = join(__dirname, 'dist')
+const DIST_DIR = path.join(__dirname, 'dist')
 const PORT = process.env.PORT || 3000
 
-const MIME_TYPES = {
-  '.html': 'text/html; charset=utf-8',
-  '.js': 'application/javascript; charset=utf-8',
-  '.css': 'text/css; charset=utf-8',
-  '.json': 'application/json; charset=utf-8',
-  '.png': 'image/png',
-  '.svg': 'image/svg+xml',
-  '.ico': 'image/x-icon',
-  '.txt': 'text/plain; charset=utf-8',
-  '.xml': 'application/xml; charset=utf-8',
-}
+const app = express()
 
-const server = http.createServer(async (req, res) => {
-  try {
-    const urlPath = decodeURIComponent(req.url.split('?')[0])
-    let filePath = join(DIST_DIR, urlPath)
+app.use('/api/licencas', rotasLicenca)
 
-    const fileStat = await stat(filePath).catch(() => null)
+app.use(express.static(DIST_DIR))
 
-    // Se não existe arquivo real (rota do React Router), serve index.html.
-    if (!fileStat || fileStat.isDirectory()) {
-      filePath = join(DIST_DIR, 'index.html')
-    }
-
-    const content = await readFile(filePath)
-    const type = MIME_TYPES[extname(filePath)] || 'application/octet-stream'
-    res.writeHead(200, { 'Content-Type': type })
-    res.end(content)
-  } catch (err) {
-    res.writeHead(500)
-    res.end('Erro interno do servidor')
-  }
+// Qualquer rota que não seja /api/* e não bata em arquivo estático cai no
+// index.html (roteamento do React Router).
+app.get(/^(?!\/api\/).*/, (_req, res) => {
+  res.sendFile(path.join(DIST_DIR, 'index.html'))
 })
 
-server.listen(PORT, () => {
-  console.log(`DSM rodando em http://localhost:${PORT}`)
+app.listen(PORT, () => {
+  console.log(`DSM (site + licenças) rodando em http://localhost:${PORT}`)
 })
