@@ -2,12 +2,13 @@ import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { Textarea } from '@/components/ui/textarea'
 import { useToast } from '@/hooks/use-toast'
 
-// E-mail que recebe as solicitações de demonstração.
+// E-mail que recebe as mensagens de suporte.
 // O FormSubmit envia um e-mail de confirmação para este endereço na primeira submissão;
 // é preciso clicar no link de confirmação para ativar o recebimento.
-const LEAD_EMAIL = 'contato@dynamicslidemaker.com.br'
+const SUPORTE_EMAIL = 'contato@dynamicslidemaker.com.br'
 
 export function CallToAction() {
   const { toast } = useToast()
@@ -19,12 +20,12 @@ export function CallToAction() {
 
     const form = e.currentTarget
     const formData = new FormData(form)
-    formData.append('_subject', 'Nova solicitação de demonstração - DSM')
+    formData.append('_subject', 'Nova mensagem de suporte - DSM')
     formData.append('_captcha', 'false')
     formData.append('_template', 'table')
 
     try {
-      const response = await fetch(`https://formsubmit.co/ajax/${LEAD_EMAIL}`, {
+      const response = await fetch(`https://formsubmit.co/ajax/${SUPORTE_EMAIL}`, {
         method: 'POST',
         headers: { Accept: 'application/json' },
         body: formData,
@@ -33,14 +34,14 @@ export function CallToAction() {
       if (!response.ok) throw new Error('Falha no envio')
 
       toast({
-        title: 'Solicitação enviada com sucesso!',
-        description: 'Nossa equipe entrará em contato em breve.',
+        title: 'Mensagem enviada com sucesso!',
+        description: 'Vamos responder no e-mail informado em breve.',
       })
       form.reset()
     } catch {
       toast({
-        title: 'Não foi possível enviar sua solicitação',
-        description: 'Tente novamente em instantes ou entre em contato por e-mail.',
+        title: 'Não foi possível enviar sua mensagem',
+        description: 'Tente novamente em instantes ou escreva direto para ' + SUPORTE_EMAIL + '.',
         variant: 'destructive',
       })
     } finally {
@@ -50,7 +51,7 @@ export function CallToAction() {
 
   return (
     <section
-      id="solicitar-acesso"
+      id="suporte"
       className="py-24 bg-primary text-primary-foreground relative overflow-hidden"
     >
       <div className="absolute -top-24 -right-24 w-96 h-96 bg-white/10 rounded-full blur-3xl" />
@@ -59,11 +60,11 @@ export function CallToAction() {
         <div className="max-w-4xl mx-auto bg-white text-slate-900 rounded-2xl shadow-2xl p-8 md:p-12 lg:p-16 flex flex-col md:flex-row gap-12 items-center">
           <div className="flex-1">
             <h2 className="text-3xl md:text-4xl font-bold font-serif mb-4 text-primary">
-              Leve o dinamismo do DSM para sua instituição.
+              Precisa de ajuda ou tem uma dúvida?
             </h2>
             <p className="text-slate-500 mb-6 text-lg">
-              Solicite uma demonstração gratuita e veja como podemos transformar a experiência em
-              sala de aula.
+              Fale com a gente — dúvidas sobre instalação, uso do DSM em sala de aula ou qualquer
+              outro assunto.
             </p>
           </div>
 
@@ -71,7 +72,7 @@ export function CallToAction() {
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="name" className="text-slate-700">
-                  Nome Completo
+                  Nome
                 </Label>
                 <Input
                   id="name"
@@ -82,20 +83,8 @@ export function CallToAction() {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="institution" className="text-slate-700">
-                  Instituição de Ensino
-                </Label>
-                <Input
-                  id="institution"
-                  name="Instituição"
-                  required
-                  placeholder="Universidade XYZ"
-                  className="bg-slate-50"
-                />
-              </div>
-              <div className="space-y-2">
                 <Label htmlFor="email" className="text-slate-700">
-                  E-mail Institucional
+                  E-mail
                 </Label>
                 <Input
                   id="email"
@@ -106,8 +95,20 @@ export function CallToAction() {
                   className="bg-slate-50"
                 />
               </div>
+              <div className="space-y-2">
+                <Label htmlFor="mensagem" className="text-slate-700">
+                  Mensagem
+                </Label>
+                <Textarea
+                  id="mensagem"
+                  name="Mensagem"
+                  required
+                  placeholder="Conte como podemos ajudar..."
+                  className="bg-slate-50 min-h-[100px]"
+                />
+              </div>
               <Button type="submit" className="w-full mt-4 h-12 text-base" disabled={isSubmitting}>
-                {isSubmitting ? 'Enviando...' : 'Solicitar Demonstração'}
+                {isSubmitting ? 'Enviando...' : 'Enviar mensagem'}
               </Button>
             </form>
           </div>

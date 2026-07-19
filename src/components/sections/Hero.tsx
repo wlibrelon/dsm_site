@@ -49,7 +49,7 @@ export function Hero() {
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
               <Button size="lg" asChild className="h-12 px-8 text-base shadow-lg">
-                <a href="#solicitar-acesso">Solicitar Acesso</a>
+                <a href="#suporte">Fale conosco</a>
               </Button>
               <Button size="lg" variant="outline" asChild className="h-12 px-8 text-base">
                 <a href="#como-funciona">

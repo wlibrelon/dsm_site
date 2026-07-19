@@ -56,7 +56,7 @@ export function Layout() {
               asChild
               className="bg-primary hover:bg-primary/90 text-white rounded-md shadow-subtle"
             >
-              <a href="#solicitar-acesso">Solicitar Acesso</a>
+              <a href="#suporte">Suporte</a>
             </Button>
           </nav>
 
@@ -83,8 +83,8 @@ export function Layout() {
               </a>
             ))}
             <Button asChild className="w-full mt-2">
-              <a href="#solicitar-acesso" onClick={() => setIsMobileMenuOpen(false)}>
-                Solicitar Acesso
+              <a href="#suporte" onClick={() => setIsMobileMenuOpen(false)}>
+                Suporte
               </a>
             </Button>
           </div>
@@ -135,8 +135,8 @@ export function Layout() {
               <h4 className="text-white font-medium mb-4">Contato</h4>
               <ul className="space-y-2 text-sm">
                 <li>
-                  <a href="#solicitar-acesso" className="hover:text-white transition-colors">
-                    Solicitar Acesso
+                  <a href="#suporte" className="hover:text-white transition-colors">
+                    Fale conosco
                   </a>
                 </li>
                 <li>
@@ -144,7 +144,7 @@ export function Layout() {
                     href="mailto:contato@dynamicslidemaker.com.br"
                     className="hover:text-white transition-colors"
                   >
-                    Suporte Institucional
+                    contato@dynamicslidemaker.com.br
                   </a>
                 </li>
               </ul>
