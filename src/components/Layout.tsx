@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Outlet, Link } from 'react-router-dom'
-import { Menu, X } from 'lucide-react'
+import { Menu, X, Download } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import logoImg from '@/assets/logo_dsm.png'
@@ -15,11 +15,12 @@ export function Layout() {
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
-  const navLinks = [
+  const navLinks: { name: string; href: string; download?: boolean }[] = [
     { name: 'O que é', href: '#o-que-e' },
     { name: 'Como funciona', href: '#como-funciona' },
     { name: 'Recursos', href: '#recursos' },
     { name: 'Casos de Uso', href: '#casos-de-uso' },
+    { name: 'Baixar App', href: '/downloads/DSM-Setup.exe', download: true },
   ]
 
   return (
@@ -47,8 +48,13 @@ export function Layout() {
               <a
                 key={link.name}
                 href={link.href}
-                className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
+                download={link.download || undefined}
+                className={cn(
+                  'text-sm font-medium text-muted-foreground hover:text-primary transition-colors',
+                  link.download && 'flex items-center gap-1.5',
+                )}
               >
+                {link.download && <Download className="h-4 w-4" />}
                 {link.name}
               </a>
             ))}
@@ -76,9 +82,14 @@ export function Layout() {
               <a
                 key={link.name}
                 href={link.href}
-                className="text-base font-medium py-2 text-foreground border-b border-gray-100"
+                download={link.download || undefined}
+                className={cn(
+                  'text-base font-medium py-2 text-foreground border-b border-gray-100',
+                  link.download && 'flex items-center gap-2',
+                )}
                 onClick={() => setIsMobileMenuOpen(false)}
               >
+                {link.download && <Download className="h-4 w-4" />}
                 {link.name}
               </a>
             ))}

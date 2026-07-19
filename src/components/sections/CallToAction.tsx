@@ -3,29 +3,38 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { useToast } from '@/hooks/use-toast'
 
-// E-mail que recebe as mensagens de suporte.
-// O FormSubmit envia um e-mail de confirmação para este endereço na primeira submissão;
-// é preciso clicar no link de confirmação para ativar o recebimento.
-const SUPORTE_EMAIL = 'contato@dynamicslidemaker.com.br'
+// E-mails que recebem as mensagens do formulário, por tipo de assunto.
+// O FormSubmit envia um e-mail de confirmação para o endereço na primeira submissão;
+// é preciso clicar no link de confirmação para ativar o recebimento (em cada um deles).
+type TipoMensagem = 'suporte' | 'administrativo'
+
+const DESTINOS: Record<TipoMensagem, { email: string; label: string }> = {
+  suporte: { email: 'suporte@dynamicslidemaker.com.br', label: 'Suporte' },
+  administrativo: { email: 'contato@dynamicslidemaker.com.br', label: 'Administrativo' },
+}
 
 export function CallToAction() {
   const { toast } = useToast()
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [tipo, setTipo] = useState<TipoMensagem>('suporte')
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     setIsSubmitting(true)
 
+    const destino = DESTINOS[tipo]
     const form = e.currentTarget
     const formData = new FormData(form)
-    formData.append('_subject', 'Nova mensagem de suporte - DSM')
+    formData.append('Assunto', destino.label)
+    formData.append('_subject', `Nova mensagem (${destino.label}) - DSM`)
     formData.append('_captcha', 'false')
     formData.append('_template', 'table')
 
     try {
-      const response = await fetch(`https://formsubmit.co/ajax/${SUPORTE_EMAIL}`, {
+      const response = await fetch(`https://formsubmit.co/ajax/${destino.email}`, {
         method: 'POST',
         headers: { Accept: 'application/json' },
         body: formData,
@@ -38,10 +47,11 @@ export function CallToAction() {
         description: 'Vamos responder no e-mail informado em breve.',
       })
       form.reset()
+      setTipo('suporte')
     } catch {
       toast({
         title: 'Não foi possível enviar sua mensagem',
-        description: 'Tente novamente em instantes ou escreva direto para ' + SUPORTE_EMAIL + '.',
+        description: 'Tente novamente em instantes ou escreva direto para ' + destino.email + '.',
         variant: 'destructive',
       })
     } finally {
@@ -70,6 +80,20 @@ export function CallToAction() {
 
           <div className="w-full md:w-[400px]">
             <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="tipo" className="text-slate-700">
+                  Assunto
+                </Label>
+                <Select value={tipo} onValueChange={(v) => setTipo(v as TipoMensagem)}>
+                  <SelectTrigger id="tipo" className="bg-slate-50">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="suporte">Suporte</SelectItem>
+                    <SelectItem value="administrativo">Administrativo</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
               <div className="space-y-2">
                 <Label htmlFor="name" className="text-slate-700">
                   Nome

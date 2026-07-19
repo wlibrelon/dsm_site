@@ -1,0 +1,9 @@
+Coloque aqui o arquivo DSM-Setup.exe (mesmo nome, mesma pasta).
+
+O menu do site já aponta para /downloads/DSM-Setup.exe. Assim que o instalador
+for colocado nesta pasta e o site for reconstruído (`npm run build`) e
+reenviado para o public_html da Hostinger (ver INSTRUCOES_DEPLOY.md), o botão
+"Baixar App" no menu passa a funcionar.
+
+Pode apagar este arquivo depois de colocar o .exe de verdade aqui, ou deixá-lo
+- ele não afeta o funcionamento do site.
