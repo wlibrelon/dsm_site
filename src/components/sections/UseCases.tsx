@@ -9,12 +9,13 @@ import {
   Line,
   BarChart,
   Bar,
+  ErrorBar,
   XAxis,
   YAxis,
   CartesianGrid,
   ResponsiveContainer,
 } from 'recharts'
-import { Droplets, Calculator, Map, Building2 } from 'lucide-react'
+import { Droplets, Calculator, Map } from 'lucide-react'
 
 export function UseCases() {
   // Hidrologia State
@@ -27,13 +28,51 @@ export function UseCases() {
   }, [flow])
 
   // Estatística State
+  // Simulação real de amostragem: sorteia n notas de cada turma a partir de
+  // populações normais conhecidas (Turma A ~ N(50, 10), Turma B ~ N(55, 10))
+  // e calcula um teste t de Welch de verdade sobre as amostras sorteadas.
   const [sampleSize, setSampleSize] = useState(30)
-  const estatisticaData = useMemo(() => {
-    const variance = 100 / Math.sqrt(sampleSize)
-    return [
-      { name: 'Grupo A', value: 50 + Math.random() * variance },
-      { name: 'Grupo B', value: 55 - Math.random() * variance },
-    ]
+  const estatistica = useMemo(() => {
+    const n = Math.max(2, Math.round(sampleSize))
+    const trueMeanA = 50
+    const trueMeanB = 55
+    const populationSD = 10
+
+    // Box-Muller: gera uma variável aleatória normal padrão
+    const randNormal = () => {
+      const u1 = Math.random() || 1e-9
+      const u2 = Math.random()
+      return Math.sqrt(-2 * Math.log(u1)) * Math.cos(2 * Math.PI * u2)
+    }
+
+    const sampleA = Array.from({ length: n }, () => trueMeanA + randNormal() * populationSD)
+    const sampleB = Array.from({ length: n }, () => trueMeanB + randNormal() * populationSD)
+
+    const mean = (arr: number[]) => arr.reduce((s, v) => s + v, 0) / arr.length
+    const stdDev = (arr: number[], m: number) =>
+      Math.sqrt(arr.reduce((s, v) => s + (v - m) ** 2, 0) / (arr.length - 1))
+
+    const meanA = mean(sampleA)
+    const meanB = mean(sampleB)
+    const sdA = stdDev(sampleA, meanA)
+    const sdB = stdDev(sampleB, meanB)
+
+    // Teste t de Welch (variâncias amostrais não assumidas iguais)
+    const seA = sdA / Math.sqrt(n)
+    const seB = sdB / Math.sqrt(n)
+    const seDiff = Math.sqrt(seA ** 2 + seB ** 2)
+    const tStat = (meanB - meanA) / seDiff
+
+    return {
+      chartData: [
+        { name: 'Grupo A', value: meanA, se: seA },
+        { name: 'Grupo B', value: meanB, se: seB },
+      ],
+      tStat,
+      seDiff,
+      // |t| > ~2 é a regra prática para p < 0.05 quando n não é muito pequeno
+      significant: Math.abs(tStat) > 2,
+    }
   }, [sampleSize])
 
   return (
@@ -49,7 +88,7 @@ export function UseCases() {
         </div>
 
         <Tabs defaultValue="hidrologia" className="w-full max-w-5xl mx-auto">
-          <TabsList className="grid grid-cols-2 md:grid-cols-4 bg-slate-800/50 p-1 rounded-xl mb-8">
+          <TabsList className="grid grid-cols-3 bg-slate-800/50 p-1 rounded-xl mb-8">
             <TabsTrigger
               value="hidrologia"
               className="data-[state=active]:bg-primary data-[state=active]:text-white rounded-lg"
@@ -67,12 +106,6 @@ export function UseCases() {
               className="data-[state=active]:bg-primary data-[state=active]:text-white rounded-lg"
             >
               <Map className="w-4 h-4 mr-2" /> Geociências
-            </TabsTrigger>
-            <TabsTrigger
-              value="gestao"
-              className="data-[state=active]:bg-primary data-[state=active]:text-white rounded-lg"
-            >
-              <Building2 className="w-4 h-4 mr-2" /> Gestão
             </TabsTrigger>
           </TabsList>
 
@@ -130,7 +163,9 @@ export function UseCases() {
                 <div className="p-8 md:w-1/3 border-b md:border-b-0 md:border-r border-slate-700 bg-slate-800/50">
                   <h3 className="text-xl font-bold mb-2">Teste de Hipótese (T-test)</h3>
                   <p className="text-sm text-slate-400 mb-8">
-                    Demonstrando o efeito do tamanho da amostra na variância entre grupos.
+                    Notas de duas turmas (populações reais N(50,10) e N(55,10)) são sorteadas a
+                    cada amostra. Veja como o tamanho da amostra afeta a confiança na diferença
+                    entre as médias.
                   </p>
                   <div className="space-y-4">
                     <Label htmlFor="amostra" className="text-slate-300">
@@ -146,13 +181,30 @@ export function UseCases() {
                       className="bg-slate-900 border-slate-700 text-white"
                     />
                   </div>
+                  <div className="mt-6 p-3 bg-slate-900/60 rounded-lg border border-slate-700 space-y-1">
+                    <p className="text-xs text-slate-400">
+                      Estatística t ={' '}
+                      <span className="font-mono text-white">{estatistica.tStat.toFixed(2)}</span>
+                    </p>
+                    <p className="text-xs text-slate-400">
+                      Erro padrão da diferença ={' '}
+                      <span className="font-mono text-white">{estatistica.seDiff.toFixed(2)}</span>
+                    </p>
+                    <p
+                      className={`text-xs font-medium ${estatistica.significant ? 'text-emerald-400' : 'text-amber-400'}`}
+                    >
+                      {estatistica.significant
+                        ? 'Diferença estatisticamente significativa (|t| > 2)'
+                        : 'Amostra pequena demais para confirmar a diferença (|t| ≤ 2)'}
+                    </p>
+                  </div>
                 </div>
                 <div className="p-8 md:w-2/3 h-[300px]">
                   <ChartContainer
                     config={{ value: { label: 'Média', color: 'hsl(var(--primary))' } }}
                     className="h-full w-full"
                   >
-                    <BarChart data={estatisticaData}>
+                    <BarChart data={estatistica.chartData}>
                       <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#334155" />
                       <XAxis dataKey="name" stroke="#94a3b8" />
                       <YAxis domain={[0, 100]} stroke="#94a3b8" />
@@ -162,7 +214,9 @@ export function UseCases() {
                         fill="#3b82f6"
                         radius={[4, 4, 0, 0]}
                         isAnimationActive={false}
-                      />
+                      >
+                        <ErrorBar dataKey="se" width={4} strokeWidth={2} stroke="#f97316" />
+                      </Bar>
                     </BarChart>
                   </ChartContainer>
                 </div>
@@ -179,20 +233,6 @@ export function UseCases() {
                 <p className="text-slate-400 text-sm">
                   Renderize shapefiles em tempo real filtrados por dados demográficos digitados
                   durante a aula.
-                </p>
-              </div>
-            </Card>
-          </TabsContent>
-
-          {/* Tab 4: Gestão (Static Mock) */}
-          <TabsContent value="gestao" className="animate-fade-in">
-            <Card className="bg-slate-800 border-slate-700 text-slate-100 p-8 flex items-center justify-center min-h-[300px]">
-              <div className="text-center max-w-md">
-                <Building2 className="w-12 h-12 mx-auto mb-4 text-slate-500" />
-                <h3 className="text-xl font-bold mb-2">Dashboards Institucionais</h3>
-                <p className="text-slate-400 text-sm">
-                  Coordenadores podem usar o DSM para apresentar KPIs do curso, filtrando anos e
-                  disciplinas ao vivo.
                 </p>
               </div>
             </Card>

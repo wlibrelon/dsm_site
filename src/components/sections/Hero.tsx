@@ -16,7 +16,7 @@ export function Hero() {
     const timer = setTimeout(() => {
       const data = Array.from({ length: 20 }, (_, i) => ({
         x: i,
-        y: Math.sin(i * 0.5) * multiplier + i * 0.2,
+        y: Math.pow(1 + multiplier / 100, i),
       }))
       setChartData(data)
       setIsUpdating(false)
