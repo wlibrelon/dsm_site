@@ -27,7 +27,7 @@ import {
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { useToast } from '@/hooks/use-toast'
-import { Loader2, LogOut, KeyRound, X } from 'lucide-react'
+import { Loader2, LogOut, KeyRound, X, Plus, Copy, Check } from 'lucide-react'
 
 const ESTADO_LABEL: Record<Licenca['estado'], { texto: string; variante: 'default' | 'secondary' | 'destructive' | 'outline' }> = {
   ativa: { texto: 'Ativa', variante: 'default' },
@@ -104,6 +104,7 @@ export default function AdminDashboard() {
             <p className="text-sm text-slate-500">{email}</p>
           </div>
           <div className="flex items-center gap-2">
+            <EmitirChaveDialog onEmitido={carregar} />
             <TrocarSenhaDialog />
             <Button variant="outline" size="sm" onClick={sair}>
               <LogOut className="w-4 h-4 mr-2" />
@@ -339,6 +340,126 @@ function TrocarSenhaDialog() {
             Salvar nova senha
           </Button>
         </form>
+      </DialogContent>
+    </Dialog>
+  )
+}
+
+/**
+ * Emite uma chave de licença anual (assinante) pra um professor, sem precisar
+ * rodar o script `emitirLicenca.js` por fora — usa o mesmo banco que o painel
+ * já está conectado. O ano de validade só começa a contar quando o professor
+ * resgatar a chave no DSM, então dá pra emitir com antecedência sem prejuízo.
+ */
+function EmitirChaveDialog({ onEmitido }: { onEmitido: () => void }) {
+  const { toast } = useToast()
+  const [aberto, setAberto] = useState(false)
+  const [nome, setNome] = useState('')
+  const [email, setEmail] = useState('')
+  const [enviando, setEnviando] = useState(false)
+  const [resultado, setResultado] = useState<{ chave: string; professor_nome: string } | null>(null)
+  const [copiado, setCopiado] = useState(false)
+
+  const resetar = () => {
+    setNome('')
+    setEmail('')
+    setResultado(null)
+    setCopiado(false)
+  }
+
+  const mudarAberto = (novoAberto: boolean) => {
+    setAberto(novoAberto)
+    if (!novoAberto) {
+      // Se uma chave já tinha sido gerada nessa sessão do diálogo, o
+      // dashboard precisa refletir o novo "pendente" ao fechar.
+      if (resultado) onEmitido()
+      resetar()
+    }
+  }
+
+  const enviar = async (e: FormEvent) => {
+    e.preventDefault()
+    if (!nome.trim() || !email.trim()) return
+    setEnviando(true)
+    try {
+      const r = await adminApi.emitirLicenca(nome.trim(), email.trim())
+      setResultado({ chave: r.chave, professor_nome: r.professor_nome })
+    } catch (err: any) {
+      toast({ title: 'Não foi possível emitir a chave', description: err.message, variant: 'destructive' })
+    } finally {
+      setEnviando(false)
+    }
+  }
+
+  const copiar = async () => {
+    if (!resultado) return
+    await navigator.clipboard.writeText(resultado.chave)
+    setCopiado(true)
+    toast({ title: 'Chave copiada.' })
+  }
+
+  return (
+    <Dialog open={aberto} onOpenChange={mudarAberto}>
+      <DialogTrigger asChild>
+        <Button size="sm">
+          <Plus className="w-4 h-4 mr-2" />
+          Emitir chave
+        </Button>
+      </DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Emitir chave de licença anual</DialogTitle>
+        </DialogHeader>
+
+        {!resultado ? (
+          <form onSubmit={enviar} className="space-y-4">
+            <div className="space-y-1.5">
+              <Label htmlFor="emitir-nome">Nome do professor</Label>
+              <Input
+                id="emitir-nome"
+                value={nome}
+                onChange={(e) => setNome(e.target.value)}
+                placeholder="Nome completo"
+                required
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="emitir-email">E-mail do professor</Label>
+              <Input
+                id="emitir-email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="professor@escola.com.br"
+                required
+              />
+            </div>
+            <p className="text-xs text-slate-400">
+              A licença fica pendente até o professor colar a chave no DSM, em "Já tenho uma licença" —
+              o ano de validade só começa a contar nesse momento.
+            </p>
+            <Button type="submit" className="w-full font-semibold" disabled={enviando}>
+              {enviando && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+              Emitir chave
+            </Button>
+          </form>
+        ) : (
+          <div className="space-y-4">
+            <p className="text-sm text-slate-600">
+              Chave gerada para <span className="font-medium">{resultado.professor_nome}</span>. Envie para
+              ele colar no DSM, em "Já tenho uma licença".
+            </p>
+            <div className="flex items-center gap-2">
+              <Input readOnly value={resultado.chave} className="font-mono text-sm" />
+              <Button type="button" variant="outline" size="icon" onClick={copiar}>
+                {copiado ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+              </Button>
+            </div>
+            <Button type="button" variant="outline" className="w-full" onClick={() => mudarAberto(false)}>
+              Concluir
+            </Button>
+          </div>
+        )}
       </DialogContent>
     </Dialog>
   )

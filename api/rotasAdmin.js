@@ -1,8 +1,10 @@
 // Painel administrativo: login + monitoramento das licenças emitidas.
 // Tudo sob /admin/api, protegido por exigirAdmin (exceto /login).
+import crypto from 'node:crypto'
 import express from 'express'
 import { query } from './db.js'
 import { autenticar, gerarToken, definirCookieSessao, limparCookieSessao, exigirAdmin, trocarSenha } from './adminAuth.js'
+import { buscarOuCriarProfessor } from './rotas.js'
 
 export const rotasAdmin = express.Router()
 
@@ -72,6 +74,33 @@ rotasAdmin.get('/licencas', exigirAdmin, async (_req, res) => {
   } catch (err) {
     console.error('[admin/licencas]', err)
     res.status(500).json({ erro: 'Erro interno ao listar licenças.' })
+  }
+})
+
+// Emissão manual de uma licença anual paga — equivalente ao script de linha
+// de comando api/emitirLicenca.js, só que rodando aqui dentro (mesmo banco
+// que o servidor de produção já usa, sem precisar de acesso via SSH/terminal
+// separado). A chave não tem máquina nem data ainda; isso só é gravado
+// quando o professor resgata (POST /api/licencas/resgatar).
+rotasAdmin.post('/licencas/emitir', express.json(), exigirAdmin, async (req, res) => {
+  const { nome, email } = req.body || {}
+  if (!nome?.trim() || !email?.trim()) {
+    return res.status(400).json({ erro: 'Informe nome e e-mail do professor.' })
+  }
+  try {
+    const professor = await buscarOuCriarProfessor(nome.trim(), email.trim().toLowerCase())
+    const token = crypto.randomBytes(12).toString('hex')
+
+    const [resultado] = await query(
+      `INSERT INTO licencas (professor_id, tipo, token_resgate, status) VALUES (?, 'assinante', ?, 'pendente')`,
+      [professor.id, token],
+    )
+
+    const chave = `${resultado.insertId}.${token}`
+    res.status(201).json({ chave, professor_nome: professor.nome, professor_email: professor.email })
+  } catch (err) {
+    console.error('[admin/emitir]', err)
+    res.status(500).json({ erro: 'Erro interno ao emitir a chave.' })
   }
 })
 

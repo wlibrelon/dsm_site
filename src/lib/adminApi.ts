@@ -52,4 +52,9 @@ export const adminApi = {
   getLicencas: () => http<Licenca[]>('/admin/api/licencas'),
   getResumo: () => http<Resumo>('/admin/api/resumo'),
   revogarLicenca: (id: number) => http<void>(`/admin/api/licencas/${id}/revogar`, { method: 'POST' }),
+  emitirLicenca: (nome: string, email: string) =>
+    http<{ chave: string; professor_nome: string; professor_email: string }>('/admin/api/licencas/emitir', {
+      method: 'POST',
+      body: JSON.stringify({ nome, email }),
+    }),
 }
