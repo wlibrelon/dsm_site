@@ -16,7 +16,8 @@ export function Audience() {
               Altamente eficaz para áreas quantitativas e científicas, mas benéfico para qualquer
               docente que utilize fórmulas, dados ou gráficos em aula — do ensino médio à
               pós-graduação. O DSM roda direto no seu computador, sem depender de servidor da
-              escola.
+              escola. Todos os conteúdos das aulas fica no próprio computador do professor. Mas
+              ele pode compartilhar com outros professores, caso deseja.
             </p>
             <ul className="space-y-4 text-muted-foreground">
               <li className="flex items-start gap-2">

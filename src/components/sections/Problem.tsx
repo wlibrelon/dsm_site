@@ -34,7 +34,7 @@ export function Problem() {
               </div>
               <p className="text-sm text-slate-400 text-center font-mono">
                 "Professor, e se a vazão fosse 150 em vez de 100?"
-                <br />— "Ah, eu teria que recalcular em casa."
+                <br />— "Ah, eu teria que recalcular. Aguarde um pouco"
               </p>
             </div>
           </div>

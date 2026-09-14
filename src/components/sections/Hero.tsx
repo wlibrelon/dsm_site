@@ -45,7 +45,8 @@ export function Hero() {
             <p className="text-lg md:text-xl text-muted-foreground mb-8 max-w-lg">
               Por fora, uma apresentação normal. Por dentro, um cálculo de verdade rodando em cada
               slide — sem você precisar programar. Mude um número na hora da aula e o gráfico
-              muda com ele, para a turma toda ver.
+              muda com ele, para a turma toda ver. Faça qualquer simulação em tempo real para
+              melhor entendimento dos alunos.
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
               <Button size="lg" asChild className="h-12 px-8 text-base shadow-lg">
